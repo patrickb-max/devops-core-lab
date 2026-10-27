@@ -1,0 +1,23 @@
+name: devops-core-lab-db
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:3102:3100"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+      ENABLE_DRILLS: "true"
+    depends_on:
+      mongo:
+        condition: service_healthy
+  mongo:
+    image: mongo:8.0
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1}).ok"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+volumes:
+  mongo-data:
